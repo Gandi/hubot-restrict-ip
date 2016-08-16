@@ -1,6 +1,6 @@
 {
   "name": "hubot-restrict-ip",
-  "description": "A hubot plugin registring an Express middleware for filtering who can access to http endpoints.",
+  "description": "A hubot plugin registering an Express middleware for filtering who can access to http endpoints.",
   "version": "0.1.0",
   "author": {
     "name": "mose",
