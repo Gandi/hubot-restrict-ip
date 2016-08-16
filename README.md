@@ -1,9 +1,7 @@
 Hubot Restrict IP Plugin
 =================================
 
-<!-- [![Version](https://img.shields.io/npm/v/hubot-restrict-ip.svg)](https://www.npmjs.com/package/hubot-restrict-ip)
-[![Downloads](https://img.shields.io/npm/dt/hubot-restrict-ip.svg)](https://www.npmjs.com/package/hubot-restrict-ip)
- -->[![Build Status](https://img.shields.io/travis/Gandi/hubot-restrict-ip.svg)](https://travis-ci.org/Gandi/hubot-restrict-ip)
+[![Build Status](https://img.shields.io/travis/Gandi/hubot-restrict-ip.svg)](https://travis-ci.org/Gandi/hubot-restrict-ip)
 [![Dependency Status](https://gemnasium.com/Gandi/hubot-restrict-ip.svg)](https://gemnasium.com/Gandi/hubot-restrict-ip)
 [![Coverage Status](https://img.shields.io/codeclimate/coverage/github/Gandi/hubot-restrict-ip.svg)](https://codeclimate.com/github/Gandi/hubot-restrict-ip/coverage)
 [![Code Climate](https://img.shields.io/codeclimate/github/Gandi/hubot-restrict-ip.svg)](https://codeclimate.com/github/Gandi/hubot-restrict-ip)
@@ -11,7 +9,7 @@ Hubot Restrict IP Plugin
 This plugin is an Express middleware that will permit to filter who has access to the http endpoints of your hubot bot.
 
     This is a draft plugin. DO NOT USE (yet)
-    
+
 
 Installation
 --------------
