@@ -17,4 +17,5 @@ room = null
 # ---------------------------------------------------------------------------------
 describe 'restrict-ip module', ->
 
-  pending 'do teh magic'
+  it 'do the magic', ->
+    expect(true).to.be.true
