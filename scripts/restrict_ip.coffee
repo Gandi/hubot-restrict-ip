@@ -14,7 +14,7 @@
 # Author:
 #   mose
 
-IP = require 'ip'
+IP = require 'range_check'
 
 
 module.exports = (robot) ->
@@ -54,12 +54,12 @@ module.exports = (robot) ->
   ipIn = (ip, list) ->
     back = false
     for it in list
-      if it.indexOf('/') > -1
-        if IP.cidrSubnet(it).contains(ip)
+      if IP.isRange(it)
+        if IP.inRange(ip, it)
           back = true
           break
       else
-        if IP.isEqual(it, ip)
+        if it is ip
           back = true
           break
     back

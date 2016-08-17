@@ -20,7 +20,7 @@
     "url": "https://github.com/Gandi/hubot-restrict-ip/issues"
   },
   "dependencies": {
-    "ip": "~1.1.3"
+    "range_check": "^1.4.0"
   },
   "peerDependencies": {
     "coffee-script": "~1.6"
