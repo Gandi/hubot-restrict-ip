@@ -61,3 +61,33 @@ describe 'restrict-ip module', ->
           expect(res.status).to.eql 200
           expect(res.text).to.eql 'okay'
           done()
+
+  context 'with no restriction and a blacklist with a CIDR', ->
+    beforeEach ->
+      process.env.HTTP_IP_BLACKLIST = [ '192.168.10.1/24' ]
+      require('../scripts/restrict_ip')(@robot)
+
+    afterEach ->
+      delete process.env.HTTP_IP_BLACKLIST
+
+    it 'blocks if ip is in blacklist', (done) ->
+      request(@robot.router)
+        .get('/endpoint')
+        .set('X-Forwarded-For', '192.168.10.1')
+        .end (err, res) ->
+          if err?
+            throw err
+          expect(res.status).to.eql 401
+          expect(res.text).to.eql 'Not authorized.'
+          done()
+
+    it 'delivers if ip is not in blacklist', (done) ->
+      request(@robot.router)
+        .get('/endpoint')
+        .set('X-Forwarded-For', '192.168.11.1')
+        .end (err, res) ->
+          if err?
+            throw err
+          expect(res.status).to.eql 200
+          expect(res.text).to.eql 'okay'
+          done()

@@ -1,5 +1,6 @@
 # Description:
-#   Express middleware that will permit to filter who has access to the http endpoints of your hubot bot
+#   Express middleware that will permit to filter
+#   who has access to the http endpoints of your hubot bot
 #
 # Coniguration:
 #   HTTP_RESTRICTED
@@ -17,25 +18,25 @@ IP = require 'ip'
 
 
 module.exports = (robot) ->
-  
+
   HTTP_RESTRICTED = process.env.HTTP_RESTRICTED?
   HTTP_ENDPOINTS_PUBLIC = process.env.HTTP_ENDPOINTS_PUBLIC?
   HTTP_IP_WHITELIST = if process.env.HTTP_IP_WHITELIST?
-      process.env.HTTP_IP_WHITELIST.split ','
-    else
-      [ ]
+    process.env.HTTP_IP_WHITELIST.split ','
+  else
+    [ ]
   HTTP_IP_BLACKLIST = if process.env.HTTP_IP_BLACKLIST?
-      process.env.HTTP_IP_BLACKLIST.split ','
-    else
-      [ ]
+    process.env.HTTP_IP_BLACKLIST.split ','
+  else
+    [ ]
   HTTP_OPEN_ENDPOINTS = if process.env.HTTP_OPEN_ENDPOINTS?
-      process.env.HTTP_OPEN_ENDPOINTS.split(',').map (ep) -> new RegExp("^#{ep}$") 
-    else
-      [ ]
+    process.env.HTTP_OPEN_ENDPOINTS.split(',').map (ep) -> new RegExp("^#{ep}$")
+  else
+    [ ]
   HTTP_CLOSED_ENDPOINTS = if process.env.HTTP_CLOSED_ENDPOINTS?
-      process.env.HTTP_CLOSED_ENDPOINTS.split(',').map (ep) -> new RegExp("^#{ep}$")
-    else
-      [ ]
+    process.env.HTTP_CLOSED_ENDPOINTS.split(',').map (ep) -> new RegExp("^#{ep}$")
+  else
+    [ ]
   HTTP_UNAUTHORIZED_MESSAGE = process.env.HTTP_UNAUTHORIZED_MESSAGE or 'Not authorized.'
 
   endpointOk = (endpoint) ->
@@ -45,8 +46,8 @@ module.exports = (robot) ->
     not endpointIn(endpoint, HTTP_CLOSED_ENDPOINTS)
 
   ipOk = (ip) ->
-    ( HTTP_RESTRICTED and 
-      ipIn(ip, HTTP_IP_WHITELIST) and 
+    ( HTTP_RESTRICTED and
+      ipIn(ip, HTTP_IP_WHITELIST) and
       not ipIn(ip, HTTP_IP_BLACKLIST) ) or
     not ipIn(ip, HTTP_IP_BLACKLIST)
 
@@ -54,13 +55,13 @@ module.exports = (robot) ->
     back = false
     for it in list
       if it.indexOf('/') > -1
-        if IP.cidrSubnet(it).contains ip
+        if IP.cidrSubnet(it).contains(ip)
           back = true
           break
       else
-      if IP.isEqual(it, ip)
-        back = true
-        break
+        if IP.isEqual(it, ip)
+          back = true
+          break
     back
 
   endpointIn = (endpoint, list) ->
