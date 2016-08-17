@@ -30,26 +30,16 @@ module.exports = (robot) ->
   else
     [ ]
   HTTP_OPEN_ENDPOINTS = if process.env.HTTP_OPEN_ENDPOINTS?
-    process.env.HTTP_OPEN_ENDPOINTS.split(',').map (ep) -> new RegExp("^#{ep}$")
+    process.env.HTTP_OPEN_ENDPOINTS.split(',').map (ep) -> 
+      new RegExp("^#{ep.replace(/\//, '\\/')}$")
   else
     [ ]
   HTTP_CLOSED_ENDPOINTS = if process.env.HTTP_CLOSED_ENDPOINTS?
-    process.env.HTTP_CLOSED_ENDPOINTS.split(',').map (ep) -> new RegExp("^#{ep}$")
+    process.env.HTTP_CLOSED_ENDPOINTS.split(',').map (ep) -> 
+      new RegExp("^#{ep.replace(/\//, '\\/')}$")
   else
     [ ]
   HTTP_UNAUTHORIZED_MESSAGE = process.env.HTTP_UNAUTHORIZED_MESSAGE or 'Not authorized.'
-
-  endpointOk = (endpoint) ->
-    ( HTTP_RESTRICTED and
-      endpointIn(endpoint, HTTP_OPEN_ENDPOINTS) and
-      not endpointIn(endpoint, HTTP_CLOSED_ENDPOINTS) ) or
-    not endpointIn(endpoint, HTTP_CLOSED_ENDPOINTS)
-
-  ipOk = (ip) ->
-    ( HTTP_RESTRICTED and
-      ipIn(ip, HTTP_IP_WHITELIST) and
-      not ipIn(ip, HTTP_IP_BLACKLIST) ) or
-    not ipIn(ip, HTTP_IP_BLACKLIST)
 
   ipIn = (ip, list) ->
     back = false
@@ -67,13 +57,19 @@ module.exports = (robot) ->
   endpointIn = (endpoint, list) ->
     back = false
     for it in list
-      if it.test ip
+      if it.test endpoint
         back = true
         break
     back
 
   isPermitted = (endpoint, ip) ->
-    endpointOk(endpoint) and ipOk(ip)
+    ( endpointIn(endpoint, HTTP_OPEN_ENDPOINTS) and not 
+      endpointIn(endpoint, HTTP_CLOSED_ENDPOINTS) ) or 
+    ( not HTTP_RESTRICTED and 
+      not endpointIn(endpoint, HTTP_CLOSED_ENDPOINTS) and 
+      not ipIn(ip, HTTP_IP_BLACKLIST) ) or 
+    ( ipIn(ip, HTTP_IP_WHITELIST) and 
+      not ipIn(ip, HTTP_IP_BLACKLIST) )
 
   restrict_ip = (req, res, next) ->
     endpoint = req.url

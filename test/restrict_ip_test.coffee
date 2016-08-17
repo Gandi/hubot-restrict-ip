@@ -124,7 +124,7 @@ describe 'restrict-ip module', ->
 
   context 'with no restriction and a blacklist (ipv6 with a CIDR)', ->
     beforeEach ->
-      process.env.HTTP_IP_BLACKLIST = [ '2001:db8:1234::0/48' ]
+      process.env.HTTP_IP_BLACKLIST = [ '2001:db8:1234::/48' ]
       require('../scripts/restrict_ip')(@robot)
 
     afterEach ->
@@ -150,4 +150,23 @@ describe 'restrict-ip module', ->
             throw err
           expect(res.status).to.eql 200
           expect(res.text).to.eql 'okay'
+          done()
+
+  context 'with no restriction and a closed endpoint', ->
+    beforeEach ->
+      process.env.HTTP_CLOSED_ENDPOINTS = [ '/endpoint' ]
+      require('../scripts/restrict_ip')(@robot)
+
+    afterEach ->
+      delete process.env.HTTP_IP_BLACKLIST
+
+    it 'blocks access', (done) ->
+      request(@robot.router)
+        .get('/endpoint')
+        .set('X-Forwarded-For', '2001:db8:1234::1')
+        .end (err, res) ->
+          if err?
+            throw err
+          expect(res.status).to.eql 401
+          expect(res.text).to.eql 'Not authorized.'
           done()
