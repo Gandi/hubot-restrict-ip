@@ -170,3 +170,23 @@ describe 'restrict-ip module', ->
           expect(res.status).to.eql 401
           expect(res.text).to.eql 'Not authorized.'
           done()
+
+  context 'with no restriction and a closed endpoint but a whitelisted ip', ->
+    beforeEach ->
+      process.env.HTTP_CLOSED_ENDPOINTS = [ '/endpoint' ]
+      process.env.HTTP_IP_WHITELIST = [ '10.0.0.0/24' ]
+      require('../scripts/restrict_ip')(@robot)
+
+    afterEach ->
+      delete process.env.HTTP_IP_BLACKLIST
+
+    it 'blocks access', (done) ->
+      request(@robot.router)
+        .get('/endpoint')
+        .set('X-Forwarded-For', '10.0.0.15')
+        .end (err, res) ->
+          if err?
+            throw err
+          expect(res.status).to.eql 200
+          expect(res.text).to.eql 'okay'
+          done()
