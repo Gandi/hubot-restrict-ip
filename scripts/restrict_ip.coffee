@@ -14,33 +14,43 @@
 #   mose
 
 IP = require 'ip'
+require('source-map-support').install {
+  handleUncaughtExceptions: false,
+  environment: 'node'
+}
 
 HTTP_RESTRICTED = process.env.HTTP_RESTRICTED?
 HTTP_ENDPOINTS_PUBLIC = process.env.HTTP_ENDPOINTS_PUBLIC?
-HTTP_IP_WHITELIST = process.env.HTTP_IP_WHITELIST?.split ','
-HTTP_IP_BLACKLIST = process.env.HTTP_IP_BLACKLIST?.split ','
-HTTP_OPEN_ENDPOINTS = process.env.HTTP_OPEN_ENDPOINTS?.
-  split(',').map (ep) -> new RegExp("^#{ep}$")
-HTTP_CLOSED_ENDPOINTS = process.env.HTTP_CLOSED_ENDPOINTS?.
-  split(',').map (ep) -> new RegExp("^#{ep}$")
+HTTP_IP_WHITELIST = if process.env.HTTP_IP_WHITELIST?
+    process.env.HTTP_IP_WHITELIST.split ','
+  else
+    [ ]
+HTTP_IP_BLACKLIST = if process.env.HTTP_IP_BLACKLIST?
+    process.env.HTTP_IP_BLACKLIST.split ','
+  else
+    [ ]
+HTTP_OPEN_ENDPOINTS = if process.env.HTTP_OPEN_ENDPOINTS?
+    process.env.HTTP_OPEN_ENDPOINTS.split(',').map (ep) -> new RegExp("^#{ep}$") 
+  else
+    [ ]
+HTTP_CLOSED_ENDPOINTS = if process.env.HTTP_CLOSED_ENDPOINTS?
+    process.env.HTTP_CLOSED_ENDPOINTS.split(',').map (ep) -> new RegExp("^#{ep}$")
+  else
+    [ ]
 HTTP_UNAUTHORIZED_MESSAGE = process.env.HTTP_UNAUTHORIZED_MESSAGE or 'Not authorized.'
 
 module.exports = (robot) ->
 
   endpointOk = (endpoint) ->
-    (
-      HTTP_RESTRICTED and
+    ( HTTP_RESTRICTED and
       endpointIn(endpoint, HTTP_OPEN_ENDPOINTS) and
-      not endpointIn(endpoint, HTTP_CLOSED_ENDPOINTS)
-    ) or
+      not endpointIn(endpoint, HTTP_CLOSED_ENDPOINTS) ) or
     not endpointIn(endpoint, HTTP_CLOSED_ENDPOINTS)
 
   ipOk = (ip) ->
-    ( 
-      HTTP_RESTRICTED and 
+    ( HTTP_RESTRICTED and 
       ipIn(ip, HTTP_IP_WHITELIST) and 
-      not ipIn(ip, HTTP_IP_BLACKLIST)
-    ) or
+      not ipIn(ip, HTTP_IP_BLACKLIST) ) or
     not ipIn(ip, HTTP_IP_BLACKLIST)
 
   ipIn = (ip, list) ->
@@ -51,7 +61,7 @@ module.exports = (robot) ->
           back = true
           break
       else
-      if IP.isEquak(it, ip)
+      if IP.isEqual(it, ip)
         back = true
         break
     back
@@ -65,11 +75,8 @@ module.exports = (robot) ->
     back
 
   isPermitted = (endpoint, ip) ->
-    ( 
-      HTTP_ENDPOINTS_PUBLIC and endpointOk(endpoint)
-    ) or (
-      endpointOk(endpoint) and ipOk(ip)
-    )
+    ( HTTP_ENDPOINTS_PUBLIC and endpointOk(endpoint) ) or 
+    ( endpointOk(endpoint) and ipOk(ip) )
 
 
   robot.router.use (req, res, next) ->
