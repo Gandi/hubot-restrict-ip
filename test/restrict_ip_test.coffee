@@ -1,40 +1,60 @@
-require('source-map-support').install {
-  handleUncaughtExceptions: false,
-  environment: 'node'
-}
-
-Helper = require('hubot-test-helper')
-
-# helper loads a specific script if it's a file
-helper = new Helper('../scripts/restrict_ip.coffee')
-
 # path   = require 'path'
+express = require 'express'
 sinon   = require 'sinon'
 expect  = require('chai').use(require('sinon-chai')).expect
 request = require 'supertest'
-
-room = null
 
 # ---------------------------------------------------------------------------------
 describe 'restrict-ip module', ->
 
   beforeEach ->
     process.env.PORT = 80800
-    room = helper.createRoom()
-    room.robot.logger.info = sinon.stub()
-    room.robot.router.enable('trust proxy')
-    room.robot.router.get '/endpoint', (req, res) ->
+    app = express()
+    app.use express.query()
+    app.enable('trust proxy')
+    @robot = { router: app }
+    @robot.router.get '/endpoint', (req, res) ->
       res.status(200).end('okay')
-
-  afterEach ->
-    room.destroy()
+    
 
   context 'with no restriction', ->
+    beforeEach ->
+      require('../scripts/restrict_ip')(@robot)
 
     it 'deliver the payload', (done) ->
-      request(room.robot.router)
+      request(@robot.router)
         .get('/endpoint')
         .set('X-Forwarded-For', '192.168.10.1')
+        .end (err, res) ->
+          if err?
+            throw err
+          expect(res.status).to.eql 200
+          expect(res.text).to.eql 'okay'
+          done()
+
+  context 'with no restriction and a blacklist', ->
+    beforeEach ->
+      process.env.HTTP_IP_BLACKLIST = [ '192.168.10.1' ]
+      require('../scripts/restrict_ip')(@robot)
+
+    afterEach ->
+      delete process.env.HTTP_IP_BLACKLIST
+
+    it 'blocks if ip is in blacklist', (done) ->
+      request(@robot.router)
+        .get('/endpoint')
+        .set('X-Forwarded-For', '192.168.10.1')
+        .end (err, res) ->
+          if err?
+            throw err
+          expect(res.status).to.eql 401
+          expect(res.text).to.eql 'Not authorized.'
+          done()
+
+    it 'delivers if ip is not in blacklist', (done) ->
+      request(@robot.router)
+        .get('/endpoint')
+        .set('X-Forwarded-For', '192.168.10.2')
         .end (err, res) ->
           if err?
             throw err

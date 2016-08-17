@@ -23,7 +23,6 @@
     "ip": "~1.1.3"
   },
   "peerDependencies": {
-    "hubot": "2.x",
     "coffee-script": "~1.6"
   },
   "devDependencies": {
@@ -33,8 +32,7 @@
     "coffee-script": "~1.6",
     "coffeelint": "^1.15.7",
     "coveralls": "^2.11.12",
-    "hubot": "2.x",
-    "hubot-test-helper": "1.4.4",
+    "express": "^3.21.2",
     "istanbul": "^0.4.4",
     "mocha": "^2.4.5",
     "sinon": "^1.4.2",

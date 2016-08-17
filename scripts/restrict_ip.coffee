@@ -14,32 +14,29 @@
 #   mose
 
 IP = require 'ip'
-require('source-map-support').install {
-  handleUncaughtExceptions: false,
-  environment: 'node'
-}
 
-HTTP_RESTRICTED = process.env.HTTP_RESTRICTED?
-HTTP_ENDPOINTS_PUBLIC = process.env.HTTP_ENDPOINTS_PUBLIC?
-HTTP_IP_WHITELIST = if process.env.HTTP_IP_WHITELIST?
-    process.env.HTTP_IP_WHITELIST.split ','
-  else
-    [ ]
-HTTP_IP_BLACKLIST = if process.env.HTTP_IP_BLACKLIST?
-    process.env.HTTP_IP_BLACKLIST.split ','
-  else
-    [ ]
-HTTP_OPEN_ENDPOINTS = if process.env.HTTP_OPEN_ENDPOINTS?
-    process.env.HTTP_OPEN_ENDPOINTS.split(',').map (ep) -> new RegExp("^#{ep}$") 
-  else
-    [ ]
-HTTP_CLOSED_ENDPOINTS = if process.env.HTTP_CLOSED_ENDPOINTS?
-    process.env.HTTP_CLOSED_ENDPOINTS.split(',').map (ep) -> new RegExp("^#{ep}$")
-  else
-    [ ]
-HTTP_UNAUTHORIZED_MESSAGE = process.env.HTTP_UNAUTHORIZED_MESSAGE or 'Not authorized.'
 
 module.exports = (robot) ->
+  
+  HTTP_RESTRICTED = process.env.HTTP_RESTRICTED?
+  HTTP_ENDPOINTS_PUBLIC = process.env.HTTP_ENDPOINTS_PUBLIC?
+  HTTP_IP_WHITELIST = if process.env.HTTP_IP_WHITELIST?
+      process.env.HTTP_IP_WHITELIST.split ','
+    else
+      [ ]
+  HTTP_IP_BLACKLIST = if process.env.HTTP_IP_BLACKLIST?
+      process.env.HTTP_IP_BLACKLIST.split ','
+    else
+      [ ]
+  HTTP_OPEN_ENDPOINTS = if process.env.HTTP_OPEN_ENDPOINTS?
+      process.env.HTTP_OPEN_ENDPOINTS.split(',').map (ep) -> new RegExp("^#{ep}$") 
+    else
+      [ ]
+  HTTP_CLOSED_ENDPOINTS = if process.env.HTTP_CLOSED_ENDPOINTS?
+      process.env.HTTP_CLOSED_ENDPOINTS.split(',').map (ep) -> new RegExp("^#{ep}$")
+    else
+      [ ]
+  HTTP_UNAUTHORIZED_MESSAGE = process.env.HTTP_UNAUTHORIZED_MESSAGE or 'Not authorized.'
 
   endpointOk = (endpoint) ->
     ( HTTP_RESTRICTED and
@@ -75,14 +72,16 @@ module.exports = (robot) ->
     back
 
   isPermitted = (endpoint, ip) ->
-    ( HTTP_ENDPOINTS_PUBLIC and endpointOk(endpoint) ) or 
-    ( endpointOk(endpoint) and ipOk(ip) )
+    endpointOk(endpoint) and ipOk(ip)
 
-
-  robot.router.use (req, res, next) ->
+  restrict_ip = (req, res, next) ->
     endpoint = req.url
-    ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress
-    if isPermitted(endpoint, ip)
+    if isPermitted(endpoint, req.ip)
       next()
     else
       res.status(401).end(HTTP_UNAUTHORIZED_MESSAGE)
+
+  robot.router.stack.splice 2, 0, {
+    route: '',
+    handle: restrict_ip
+  }
