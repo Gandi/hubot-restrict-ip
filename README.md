@@ -25,10 +25,10 @@ Configuration
 -----------------
 
 - `HTTP_RESTRICTED` if set, protects all express endpoints by default, only the open_endpoints are reachable by everybody, and the ip_whitelist
-- `HTTP_IP_WHITELIST` only useful when HTTP_RESTRICTED is set
-- `HTTP_IP_BLACKLIST` overwrite the whitelist if HTTP_RESTRICTED is set, and blocks ips listed anyways if not
+- `HTTP_IP_WHITELIST` only useful when `HTTP_RESTRICTED` is set
+- `HTTP_IP_BLACKLIST` overwrite the whitelist if `HTTP_RESTRICTED` is set, and blocks ips listed anyways if not
 - `HTTP_OPEN_ENDPOINTS` over-rules any other configuration to keep those endpoints open
-- `HTTP_CLOSED_ENDPOINTS` if HTTP_RESTRICTED is set and HTTP_OPEN_ENDPOINTS are contradicted by HTTP_CLOSED_ENDPOINTS, the closed one wins.
+- `HTTP_CLOSED_ENDPOINTS` if `HTTP_RESTRICTED` is set and `HTTP_OPEN_ENDPOINTS` are contradicted by `HTTP_CLOSED_ENDPOINTS`, the closed one wins.
 - `HTTP_UNAUTHORIZED_MESSAGE` the message provided with the `401` status triggered when access is restricted by any rule.
 
 With
