@@ -1,5 +1,6 @@
 Hubot-restrict-ip Changelog
 ==========================
 
-### 0.1.0 - wip
+### 0.1.0 - 2016-08-18
+- nominal full coverage, but need to add more edge cases
 - initial code draft

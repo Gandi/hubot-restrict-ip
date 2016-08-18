@@ -190,3 +190,23 @@ describe 'restrict-ip module', ->
           expect(res.status).to.eql 200
           expect(res.text).to.eql 'okay'
           done()
+
+  context 'with restriction and an open endpoint', ->
+    beforeEach ->
+      process.env.HTTP_OPEN_ENDPOINTS = [ '/endpoint' ]
+      process.env.HTTP_RESTRICTED = 'yes'
+      require('../scripts/restrict_ip')(@robot)
+
+    afterEach ->
+      delete process.env.HTTP_IP_BLACKLIST
+
+    it 'blocks access', (done) ->
+      request(@robot.router)
+        .get('/endpoint')
+        .set('X-Forwarded-For', '10.0.0.15')
+        .end (err, res) ->
+          if err?
+            throw err
+          expect(res.status).to.eql 200
+          expect(res.text).to.eql 'okay'
+          done()

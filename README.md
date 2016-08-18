@@ -8,7 +8,6 @@ Hubot Restrict IP Plugin
 
 This plugin is an Express middleware that will permit to filter who has access to the http endpoints of your hubot bot.
 
-    This is a draft plugin. DO NOT USE (yet)
 
 
 Installation
@@ -23,13 +22,17 @@ Then add `hubot-restrict-ip` to `external-scripts.json`
 Configuration
 -----------------
 
-- `HTTP_RESTRICTED`
-- `HTTP_IP_WHITELIST`
-- `HTTP_IP_BLACKLIST`
-- `HTTP_OPEN_ENDPOINTS`
-- `HTTP_CLOSED_ENDPOINTS`
-- `HTTP_UNAUTHORIZED_MESSAGE`
+- `HTTP_RESTRICTED` if set, protects all express endpoints by default, only the open_endpoints are reachable by everybody, and the ip_whitelist
+- `HTTP_IP_WHITELIST` only useful when HTTP_RESTRICTED is set
+- `HTTP_IP_BLACKLIST` overwrite the whitelist if HTTP_RESTRICTED is set, and blocks ips listed anyways if not
+- `HTTP_OPEN_ENDPOINTS` over-rules any other configuration to keep those endpoints open
+- `HTTP_CLOSED_ENDPOINTS` if HTTP_RESTRICTED is set and HTTP_OPEN_ENDPOINTS are contradicted by HTTP_CLOSED_ENDPOINTS, the closed one wins.
+- `HTTP_UNAUTHORIZED_MESSAGE` the message provided with the `401` status triggered when access is restricted by any rule.
 
+With
+
+- The IP lists are separated by `,` commas, and use CIDR for range definition like `192.168.0.0/24`. IP can also be IPv6 ranges.
+- the endpoints are a list of endpoints, separated by commas too, like `/hubot/help` but it can also be a regexp like `/.*/help`
 
 Testing
 ----------------

@@ -30,12 +30,12 @@ module.exports = (robot) ->
   else
     [ ]
   HTTP_OPEN_ENDPOINTS = if process.env.HTTP_OPEN_ENDPOINTS?
-    process.env.HTTP_OPEN_ENDPOINTS.split(',').map (ep) -> 
+    process.env.HTTP_OPEN_ENDPOINTS.split(',').map (ep) ->
       new RegExp("^#{ep.replace(/\//, '\\/')}$")
   else
     [ ]
   HTTP_CLOSED_ENDPOINTS = if process.env.HTTP_CLOSED_ENDPOINTS?
-    process.env.HTTP_CLOSED_ENDPOINTS.split(',').map (ep) -> 
+    process.env.HTTP_CLOSED_ENDPOINTS.split(',').map (ep) ->
       new RegExp("^#{ep.replace(/\//, '\\/')}$")
   else
     [ ]
@@ -63,12 +63,12 @@ module.exports = (robot) ->
     back
 
   isPermitted = (endpoint, ip) ->
-    ( endpointIn(endpoint, HTTP_OPEN_ENDPOINTS) and not 
-      endpointIn(endpoint, HTTP_CLOSED_ENDPOINTS) ) or 
-    ( not HTTP_RESTRICTED and 
-      not endpointIn(endpoint, HTTP_CLOSED_ENDPOINTS) and 
-      not ipIn(ip, HTTP_IP_BLACKLIST) ) or 
-    ( ipIn(ip, HTTP_IP_WHITELIST) and 
+    ( endpointIn(endpoint, HTTP_OPEN_ENDPOINTS) and not
+      endpointIn(endpoint, HTTP_CLOSED_ENDPOINTS) ) or
+    ( not HTTP_RESTRICTED and
+      not endpointIn(endpoint, HTTP_CLOSED_ENDPOINTS) and
+      not ipIn(ip, HTTP_IP_BLACKLIST) ) or
+    ( ipIn(ip, HTTP_IP_WHITELIST) and
       not ipIn(ip, HTTP_IP_BLACKLIST) )
 
   restrict_ip = (req, res, next) ->
