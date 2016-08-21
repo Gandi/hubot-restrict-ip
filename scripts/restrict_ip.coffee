@@ -4,7 +4,6 @@
 #
 # Coniguration:
 #   HTTP_RESTRICTED
-#   HTTP_ENDPOINTS_PUBLIC
 #   HTTP_IP_WHITELIST
 #   HTTP_IP_BLACKLIST
 #   HTTP_OPEN_ENDPOINTS
@@ -16,11 +15,9 @@
 
 IP = require 'range_check'
 
-
 module.exports = (robot) ->
 
   HTTP_RESTRICTED = process.env.HTTP_RESTRICTED?
-  HTTP_ENDPOINTS_PUBLIC = process.env.HTTP_ENDPOINTS_PUBLIC?
   HTTP_IP_WHITELIST = if process.env.HTTP_IP_WHITELIST?
     process.env.HTTP_IP_WHITELIST.split ','
   else
