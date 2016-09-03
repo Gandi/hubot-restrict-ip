@@ -8,9 +8,9 @@ Hubot Restrict IP Plugin
 [![Coverage Status](https://img.shields.io/codeclimate/coverage/github/Gandi/hubot-restrict-ip.svg)](https://codeclimate.com/github/Gandi/hubot-restrict-ip/coverage)
 [![Code Climate](https://img.shields.io/codeclimate/github/Gandi/hubot-restrict-ip.svg)](https://codeclimate.com/github/Gandi/hubot-restrict-ip)
 
+[![NPM](https://nodei.co/npm/hubot-restrict-ip.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/hubot-restrict-ip/)
+
 This plugin is an Express middleware that will permit to filter who has access to the http endpoints of your hubot bot.
-
-
 
 Installation
 --------------
