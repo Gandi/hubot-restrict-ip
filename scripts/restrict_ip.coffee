@@ -73,6 +73,7 @@ module.exports = (robot) ->
     if isPermitted(endpoint, req.ip)
       next()
     else
+      robot.logger.warning "Denied access to #{req.ip}."
       res.status(401).end(HTTP_UNAUTHORIZED_MESSAGE)
 
   robot.router.stack.splice 2, 0, {

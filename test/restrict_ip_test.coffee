@@ -41,6 +41,9 @@ describe 'restrict-ip module', ->
       delete process.env.HTTP_IP_BLACKLIST
 
     it 'blocks if ip is in blacklist', (done) ->
+      robot = @robot
+      robot.logger = sinon.spy()
+      robot.logger.warning = sinon.spy()
       request(@robot.router)
         .get('/endpoint')
         .set('X-Forwarded-For', '192.168.10.1')
@@ -49,6 +52,7 @@ describe 'restrict-ip module', ->
             throw err
           expect(res.status).to.eql 401
           expect(res.text).to.eql 'Not authorized.'
+          expect(robot.logger.warning).calledWith 'Denied access to 192.168.10.1.'
           done()
 
     it 'delivers if ip is not in blacklist', (done) ->
