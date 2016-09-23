@@ -18,6 +18,7 @@ IP = require 'range_check'
 module.exports = (robot) ->
 
   HTTP_RESTRICTED = process.env.HTTP_RESTRICTED?
+  HTTP_LOG_RESTRICTED = process.env.HTTP_LOG_RESTRICTED?
   HTTP_IP_WHITELIST = if process.env.HTTP_IP_WHITELIST?
     process.env.HTTP_IP_WHITELIST.split ','
   else
@@ -73,7 +74,8 @@ module.exports = (robot) ->
     if isPermitted(endpoint, req.ip)
       next()
     else
-      robot.logger.warning "Denied access to #{req.ip}"
+      if HTTP_LOG_RESTRICTED
+        robot.logger.warning "Denied access #{endpoint} to #{req.ip}"
       res.status(401).end(HTTP_UNAUTHORIZED_MESSAGE)
 
   robot.router.stack.splice 2, 0, {

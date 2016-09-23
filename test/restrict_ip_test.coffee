@@ -41,6 +41,28 @@ describe 'restrict-ip module', ->
 
   context 'with no restriction and a blacklist (ipv4)', ->
     beforeEach ->
+      process.env.HTTP_LOG_RESTRICTED = 'true'
+      process.env.HTTP_IP_BLACKLIST = [ '192.168.10.1' ]
+      require('../scripts/restrict_ip')(@robot)
+
+    afterEach ->
+      delete process.env.HTTP_IP_BLACKLIST
+      delete process.env.HTTP_LOG_RESTRICTED
+
+    it 'blocks if ip is in blacklist', (done) ->
+      request(@robot.router)
+        .get('/endpoint')
+        .set('X-Forwarded-For', '192.168.10.1')
+        .end (err, res) =>
+          if err?
+            throw err
+          expect(res.status).to.eql 401
+          expect(res.text).to.eql 'Not authorized.'
+          expect(@robot.logger.warning).calledWith 'Denied access /endpoint to 192.168.10.1'
+          done()
+
+  context 'with no restriction and a blacklist (ipv4)', ->
+    beforeEach ->
       process.env.HTTP_IP_BLACKLIST = [ '192.168.10.1' ]
       require('../scripts/restrict_ip')(@robot)
 
@@ -56,8 +78,9 @@ describe 'restrict-ip module', ->
             throw err
           expect(res.status).to.eql 401
           expect(res.text).to.eql 'Not authorized.'
-          expect(@robot.logger.warning).calledWith 'Denied access to 192.168.10.1'
+          expect(@robot.logger.warning).not.called
           done()
+
 
     it 'delivers if ip is not in blacklist', (done) ->
       request(@robot.router)
@@ -72,11 +95,13 @@ describe 'restrict-ip module', ->
 
   context 'with no restriction and a blacklist (ipv4 with a CIDR)', ->
     beforeEach ->
+      process.env.HTTP_LOG_RESTRICTED = 'true'
       process.env.HTTP_IP_BLACKLIST = [ '192.168.10.1/24' ]
       require('../scripts/restrict_ip')(@robot)
 
     afterEach ->
       delete process.env.HTTP_IP_BLACKLIST
+      delete process.env.HTTP_LOG_RESTRICTED
 
     it 'blocks if ip is in blacklist', (done) ->
       request(@robot.router)
@@ -86,7 +111,7 @@ describe 'restrict-ip module', ->
           if err?
             throw err
           expect(res.status).to.eql 401
-          expect(@robot.logger.warning).calledWith 'Denied access to 192.168.10.1'
+          expect(@robot.logger.warning).calledWith 'Denied access /endpoint to 192.168.10.1'
           expect(res.text).to.eql 'Not authorized.'
           done()
 
@@ -103,11 +128,13 @@ describe 'restrict-ip module', ->
 
   context 'with no restriction and a blacklist (ipv6)', ->
     beforeEach ->
+      process.env.HTTP_LOG_RESTRICTED = 'true'
       process.env.HTTP_IP_BLACKLIST = [ '2001:db8::2:1' ]
       require('../scripts/restrict_ip')(@robot)
 
     afterEach ->
       delete process.env.HTTP_IP_BLACKLIST
+      delete process.env.HTTP_LOG_RESTRICTED
 
     it 'blocks if ip is in blacklist', (done) ->
       request(@robot.router)
@@ -117,7 +144,7 @@ describe 'restrict-ip module', ->
           if err?
             throw err
           expect(res.status).to.eql 401
-          expect(@robot.logger.warning).calledWith 'Denied access to 2001:db8::2:1'
+          expect(@robot.logger.warning).calledWith 'Denied access /endpoint to 2001:db8::2:1'
           expect(res.text).to.eql 'Not authorized.'
           done()
 
@@ -134,11 +161,13 @@ describe 'restrict-ip module', ->
 
   context 'with no restriction and a blacklist (ipv6 with a CIDR)', ->
     beforeEach ->
+      process.env.HTTP_LOG_RESTRICTED = 'true'
       process.env.HTTP_IP_BLACKLIST = [ '2001:db8:1234::/48' ]
       require('../scripts/restrict_ip')(@robot)
 
     afterEach ->
       delete process.env.HTTP_IP_BLACKLIST
+      delete process.env.HTTP_LOG_RESTRICTED
 
     it 'blocks if ip is in blacklist', (done) ->
       request(@robot.router)
@@ -148,7 +177,7 @@ describe 'restrict-ip module', ->
           if err?
             throw err
           expect(res.status).to.eql 401
-          expect(@robot.logger.warning).calledWith 'Denied access to 2001:db8:1234::1'
+          expect(@robot.logger.warning).calledWith 'Denied access /endpoint to 2001:db8:1234::1'
           expect(res.text).to.eql 'Not authorized.'
           done()
 
@@ -165,11 +194,13 @@ describe 'restrict-ip module', ->
 
   context 'with no restriction and a closed endpoint', ->
     beforeEach ->
+      process.env.HTTP_LOG_RESTRICTED = 'true'
       process.env.HTTP_CLOSED_ENDPOINTS = [ '/endpoint' ]
       require('../scripts/restrict_ip')(@robot)
 
     afterEach ->
       delete process.env.HTTP_IP_BLACKLIST
+      delete process.env.HTTP_LOG_RESTRICTED
 
     it 'blocks access', (done) ->
       request(@robot.router)
@@ -179,17 +210,19 @@ describe 'restrict-ip module', ->
           if err?
             throw err
           expect(res.status).to.eql 401
-          expect(@robot.logger.warning).calledWith 'Denied access to 2001:db8:1234::1'
+          expect(@robot.logger.warning).calledWith 'Denied access /endpoint to 2001:db8:1234::1'
           expect(res.text).to.eql 'Not authorized.'
           done()
 
   context 'with no restriction and a closed regex endpoint', ->
     beforeEach ->
+      process.env.HTTP_LOG_RESTRICTED = 'true'
       process.env.HTTP_CLOSED_ENDPOINTS = [ '/end.*' ]
       require('../scripts/restrict_ip')(@robot)
 
     afterEach ->
       delete process.env.HTTP_IP_BLACKLIST
+      delete process.env.HTTP_LOG_RESTRICTED
 
     it 'blocks access', (done) ->
       request(@robot.router)
@@ -199,7 +232,7 @@ describe 'restrict-ip module', ->
           if err?
             throw err
           expect(res.status).to.eql 401
-          expect(@robot.logger.warning).calledWith 'Denied access to 2001:db8:1234::1'
+          expect(@robot.logger.warning).calledWith 'Denied access /endpoint to 2001:db8:1234::1'
           expect(res.text).to.eql 'Not authorized.'
           done()
 
@@ -212,6 +245,7 @@ describe 'restrict-ip module', ->
 
     afterEach ->
       delete process.env.HTTP_IP_BLACKLIST
+      delete process.env.HTTP_LOG_RESTRICTED
 
     it 'blocks access', (done) ->
       request(@robot.router)

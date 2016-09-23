@@ -23,6 +23,7 @@ Configuration
 -----------------
 
 - `HTTP_RESTRICTED` if set, protects all express endpoints by default, only the open_endpoints are reachable by everybody, and the ip_whitelist
+- `HTTP_LOG_RESTRICTED` if set, hubot will log (warning level) the unauthorized calls
 - `HTTP_IP_WHITELIST` only useful when `HTTP_RESTRICTED` is set
 - `HTTP_IP_BLACKLIST` overwrite the whitelist if `HTTP_RESTRICTED` is set, and blocks ips listed anyways if not
 - `HTTP_OPEN_ENDPOINTS` over-rules any other configuration to keep those endpoints open
